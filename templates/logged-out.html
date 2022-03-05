@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Stylesheets -->
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='styles/logged-out.css') }}"
+  />
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='styles/global.css') }}"
+  />
+
+  <title>Logged Out Successfully</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Logged Out Successfully. Please Close All Tabs That Are Running Chat App.</h1>
+    <p><a class="login-link" href="/login">Login</a></p>
+  </div>
+</body>
+</html>

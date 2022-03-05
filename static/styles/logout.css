@@ -1,0 +1,43 @@
+html {
+  width: 100vw;
+  height: 100vh;
+}
+body {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #ecf0f1;
+}
+.container {
+  margin: 0 12px;
+  background-color: #fff;
+  padding: 28px 25px;
+  border-radius: 8px;
+  text-align: center;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 14px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+h1 {
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+.option {
+  border: 0;
+  border-radius: 3px;
+  text-decoration: none;
+  color: #fff;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.option-confirm {
+  background-color: #e74c3c;
+}
+.option-cancel {
+  background-color: #2ecc71;
+}

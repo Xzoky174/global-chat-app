@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Socket IO -->
+    <script
+      src="https://cdn.socket.io/4.4.1/socket.io.min.js"
+      integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- XSS Prevention -->
+    <script src="https://rawgit.com/leizongmin/js-xss/master/dist/xss.js"></script>
+
+    <!-- Stylesheets -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/global.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/index.css') }}"
+    />
+
+    <title>Socket IO</title>
+  </head>
+  <body>
+    <div class="app">
+      <ul id="messages" class="messages">
+        {% if not messages %}
+          <h1 id="noMessages" class="no-messages">No Messages Here...</h1>
+        {% else %}
+          {% for message in messages %}
+          <li>
+            <div class="message">
+              <p class="message-author">
+                {% if message.author == username %} You {% else %} {{
+                message.author }} {% endif %}
+              </p>
+              <p class="message-message">{{ message.message }}</p>
+            </div>
+          </li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+
+      <form id="form" class="form" autocomplete="off">
+        <input
+          type="text"
+          placeholder="Type Your Message..."
+          id="message"
+          name="message"
+          class="messageInput"
+          autocomplete="false"
+          required
+        />
+        <button class="messageSendBtn">
+          <img src="{{ url_for('static', filename='img/send_icon.svg') }}" alt="Send">
+        </button>
+      </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script>
+      initialize("{{ username }}", "{{ uid }}");
+    </script>
+  </body>
+</html>
