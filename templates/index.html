@@ -48,7 +48,7 @@
       </ul>
 
       <form id="form" class="form" autocomplete="off">
-        <input
+        <textarea
           type="text"
           placeholder="Type Your Message..."
           id="message"
@@ -56,7 +56,7 @@
           class="messageInput"
           autocomplete="false"
           required
-        />
+        ></textarea>
         <button class="messageSendBtn">
           <img src="{{ url_for('static', filename='img/send_icon.svg') }}" alt="Send">
         </button>

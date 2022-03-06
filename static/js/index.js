@@ -34,13 +34,29 @@ function initialize(username, uid) {
     }
   });
 
-  messageInput.addEventListener("input", () => {
+  const inputChangeListener = () => {
+    let lines = messageInput.value.split(/\r|\r\n|\n/).length;
+    let root = document.querySelector(":root");
+
+    if (lines > 1) {
+      console.log("lines > 1");
+      root.style.setProperty("--input-padding-top-bottom", "2px");
+    } else {
+      console.log("lines <= 1");
+      root.style.setProperty("--input-padding-top-bottom", "15px");
+    }
+
     if (messageInput.value === "") {
       socket.emit("stop-typing");
     } else {
       socket.emit("typing", username);
     }
-  });
+  };
+
+  messageInput.addEventListener("input", inputChangeListener);
+  messageInput.addEventListener("paste", inputChangeListener);
+  messageInput.addEventListener("change", inputChangeListener);
+
   messageInput.addEventListener("focusout", () => {
     socket.emit("stop-typing");
   });
