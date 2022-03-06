@@ -250,19 +250,11 @@ def logout(*_):
 def logged_out():
     return render_template("logged-out.html")
 
-@app.route('/delete')
-def delete():
-    messages = Message.query.all()
 
-    for message in messages:
-        db.session.delete(message)
-
-    db.session.commit()
-    return 'Successful!'
-
-@socketio.on('connect')
+@socketio.on("connect")
 def connected():
     print(f"\n*[{datetime.now()}] New User Connected*\n")
+
 
 @socketio.on("message")
 def event(params):
@@ -283,6 +275,7 @@ def event(params):
 @socketio.on("typing")
 def event(username):
     emit("typing", username, broadcast=True, include_self=False)
+
 
 @socketio.on("stop-typing")
 def event():
