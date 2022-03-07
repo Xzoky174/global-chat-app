@@ -4,6 +4,10 @@ var form = document.getElementById("form");
 var messages = document.getElementById("messages");
 var messageInput = document.getElementById("message");
 var noMessages = document.getElementById("noMessages");
+var sendBtn = document.getElementById("submit-btn");
+
+let prevKey = "";
+let holdingShift = false;
 
 function goDown() {
   messages.scrollTop = messages.scrollHeight;
@@ -29,9 +33,10 @@ function initialize(username, uid) {
         author_uid: uid,
       });
 
-      messageInput.value = "";
-      messageInput.blur();
+      socket.emit("stop-typing");
     }
+
+    messageInput.value = "";
   });
 
   const inputChangeListener = () => {
@@ -39,10 +44,8 @@ function initialize(username, uid) {
     let root = document.querySelector(":root");
 
     if (lines > 1) {
-      console.log("lines > 1");
       root.style.setProperty("--input-padding-top-bottom", "2px");
     } else {
-      console.log("lines <= 1");
       root.style.setProperty("--input-padding-top-bottom", "15px");
     }
 
@@ -57,8 +60,22 @@ function initialize(username, uid) {
   messageInput.addEventListener("paste", inputChangeListener);
   messageInput.addEventListener("change", inputChangeListener);
 
+  const keyDown = (e) => {
+    let code = e.code;
+
+    if (code === "Enter" && !prevKey.includes("Shift")) {
+      sendBtn.click();
+      messageInput.value = "";
+    }
+
+    prevKey = code === "Enter" && prevKey.includes("Shift") ? "Shift" : code;
+  };
+
+  messageInput.addEventListener("focusin", () => {
+    messageInput.addEventListener("keydown", keyDown);
+  });
   messageInput.addEventListener("focusout", () => {
-    socket.emit("stop-typing");
+    messageInput.removeEventListener("keydown", keyDown);
   });
 
   socket.on("message", (info) => {
