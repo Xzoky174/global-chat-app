@@ -12,12 +12,14 @@ let holdingShift = false;
 function goDown() {
   messages.scrollTop = messages.scrollHeight;
 }
-
 function removeTypingMessage() {
   let typing = document.querySelector(".typing");
 
   if (typing !== null && typing !== undefined) typing.remove();
   noMessages = document.getElementById("noMessages");
+}
+function clearInput() {
+  messageInput.value = "";
 }
 
 goDown();
@@ -36,7 +38,7 @@ function initialize(username, uid) {
       socket.emit("stop-typing");
     }
 
-    messageInput.value = "";
+    clearInput();
   });
 
   const inputChangeListener = () => {
@@ -65,7 +67,8 @@ function initialize(username, uid) {
 
     if (code === "Enter" && !prevKey.includes("Shift")) {
       sendBtn.click();
-      messageInput.value = "";
+
+      messageInput.blur();
     }
 
     prevKey = code === "Enter" && prevKey.includes("Shift") ? "Shift" : code;
@@ -93,6 +96,9 @@ function initialize(username, uid) {
     if (noMessages !== null && noMessages !== undefined) {
       noMessages.classList.add("hidden");
     }
+
+    author === "You" && messageInput.focus();
+
     goDown();
   });
   socket.on("typing", (username) => {
