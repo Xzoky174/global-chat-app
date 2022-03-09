@@ -24,7 +24,9 @@ function clearInput() {
 
 goDown();
 
-function initialize(username, uid) {
+function initialize(username, uid, timed_out) {
+  messageInput.disabled = timed_out === "True";
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -116,5 +118,16 @@ function initialize(username, uid) {
   });
   socket.on("stop-typing", () => {
     removeTypingMessage();
+  });
+  socket.on("spam", () => {
+    console.log("spam!");
+    messageInput.disabled = true;
+
+    setTimeout(() => {
+      messageInput.disabled = false;
+    }, 15000);
+  });
+  socket.on("time_out_finished", () => {
+    messageInput.disabled = false;
   });
 }

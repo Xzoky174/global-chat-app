@@ -7,12 +7,14 @@ from flask import Flask, redirect, render_template, request, make_response
 from flask_socketio import SocketIO, emit
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import exc
+from sqlalchemy import ColumnDefault, exc
 
 from flask_jwt_extended import JWTManager, create_access_token, decode_token
 from datetime import timedelta, datetime
 from uuid import uuid4
 from bcrypt import hashpw, gensalt, checkpw
+
+from threading import Timer
 
 load_dotenv(".env.local")
 
@@ -28,7 +30,7 @@ jwt = JWTManager(app)
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    message = db.Column(db.String(250), nullable=False)
+    message = db.Column(db.Text, nullable=False)
     author = db.Column(db.String(20), nullable=False)
     author_uid = db.Column(db.String(32), nullable=False)
 
@@ -40,10 +42,12 @@ class User(db.Model):
     uid = db.Column(db.String(32), primary_key=True, nullable=False)
     username = db.Column(db.String(16), nullable=False, unique=True)
     password = db.Column(db.String(60), nullable=False)
+    timed_out = db.Column(db.Boolean(), ColumnDefault(False))
 
     def __repr__(self) -> str:
         return f"<User {self.uid}>"
 
+usersSentMessages = {}
 
 socketio = SocketIO(app)
 
@@ -106,7 +110,7 @@ def home(user, uid):
     messages = Message.query.all()
 
     return render_template(
-        "index.html", messages=messages, username=user.username, uid=uid
+        "index.html", messages=messages, username=user.username, uid=uid, timed_out=user.timed_out
     )
 
 
@@ -258,6 +262,40 @@ def connected():
 
 @socketio.on("message")
 def event(params):
+    author = params['author']
+
+    def resetMessages():
+        usersSentMessages[author] = 0
+        print('reset!')
+    def disable_timed_out():
+        user = User.query.filter_by(username=author).first()
+        user.timed_out = False
+
+        db.session.commit()
+        emit('time_out_finished')
+
+    if (author in usersSentMessages):
+        if (usersSentMessages[author] == 3):
+            emit('spam')
+
+            user = User.query.filter_by(username=author).first()
+            user.timed_out = True
+
+            db.session.commit()
+
+            Timer(10.0, resetMessages).start()
+            Timer(10.0, disable_timed_out).start()
+
+
+            return
+
+        usersSentMessages[author] += 1
+
+    else:
+        usersSentMessages[author] = 1
+
+    Timer(2.0, resetMessages).start()
+
     message = Message(**params)
 
     db.session.add(message)
