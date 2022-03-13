@@ -47,6 +47,7 @@ class User(db.Model):
     def __repr__(self) -> str:
         return f"<User {self.uid}>"
 
+
 usersSentMessages = {}
 
 socketio = SocketIO(app)
@@ -110,7 +111,11 @@ def home(user, uid):
     messages = Message.query.all()
 
     return render_template(
-        "index.html", messages=messages, username=user.username, uid=uid, timed_out=user.timed_out
+        "index.html",
+        messages=messages,
+        username=user.username,
+        uid=uid,
+        timed_out=user.timed_out,
     )
 
 
@@ -262,21 +267,22 @@ def connected():
 
 @socketio.on("message")
 def event(params):
-    author = params['author']
+    author = params["author"]
 
     def resetMessages():
         usersSentMessages[author] = 0
-        print('reset!')
+        print("reset!")
+
     def disable_timed_out():
         user = User.query.filter_by(username=author).first()
         user.timed_out = False
 
         db.session.commit()
-        emit('time_out_finished')
+        emit("time_out_finished")
 
-    if (author in usersSentMessages):
-        if (usersSentMessages[author] == 3):
-            emit('spam')
+    if author in usersSentMessages:
+        if usersSentMessages[author] == 3:
+            emit("spam")
 
             user = User.query.filter_by(username=author).first()
             user.timed_out = True
@@ -285,7 +291,6 @@ def event(params):
 
             Timer(10.0, resetMessages).start()
             Timer(10.0, disable_timed_out).start()
-
 
             return
 
